@@ -41,7 +41,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     log.error("Error code: {}, path: {}, message: {}",code, path, message);
     return ResponseEntity
-            .status(200)
+            .status(400)
             .body(ApiExceptionEntity.builder()
                     .errorCode(code)
                     .errorMessage(message)

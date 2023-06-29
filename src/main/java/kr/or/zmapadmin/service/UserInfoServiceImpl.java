@@ -42,6 +42,11 @@ public class UserInfoServiceImpl {
         this.tokenProvider = tokenProvider;
     }
 
+    public UserInfoVo getUserInfo(UserInfoVo userInfoVo){
+
+        return userInfoRepository.findById(userInfoVo.getId()).get().toDomain();
+    }
+
     public UserInfoVo login(UserInfoVo reqInfoVo){
         /*Optional<UserInfoEntity> userInfoEntity = Optional.of(userInfoRepository.findByIdAndPassword(reqInfoVo.getId(),reqInfoVo.getPassword())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.ERROR_0001)));
@@ -63,7 +68,7 @@ public class UserInfoServiceImpl {
         Map<String,String> claims = new HashMap<>();
         claims.put("id",token.getId());
         claims.put("name",token.getName());
-
+        claims.put("email","test@zmap.or.kr");
         JwtAuthToken jwtAuthToken = tokenProvider.createAuthToken(
                 token.getPrincipal().toString()
                 ,token.getAuthorities().iterator().next().getAuthority()

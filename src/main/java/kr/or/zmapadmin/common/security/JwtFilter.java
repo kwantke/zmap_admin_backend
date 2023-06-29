@@ -1,5 +1,6 @@
 package kr.or.zmapadmin.common.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -24,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static kr.or.zmapadmin.common.exption.ExceptionEnum.ERROR_TOKEN_0001;
 
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
@@ -60,11 +63,20 @@ public class JwtFilter extends OncePerRequestFilter {
     Optional<String> token = resolveToken(request);
     try {
 
+      /*if(token.isPresent()){
+        JwtAuthToken jwtAuthToken = tokenProvider.convertAuthToken(token.get());
 
+        if(jwtAuthToken.validate()) {
+          Authentication authentication = tokenProvider.getAuthentication(jwtAuthToken);
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+      }*/
       if(token.isPresent()){
         JwtAuthToken jwtAuthToken = tokenProvider.convertAuthToken(token.get());
 
         if(jwtAuthToken.validate()) {
+          Claims userInfo = jwtAuthToken.getData();
+
           Authentication authentication = tokenProvider.getAuthentication(jwtAuthToken);
           SecurityContextHolder.getContext().setAuthentication(authentication);
           //filterChain.doFilter(request, response);
@@ -72,15 +84,17 @@ public class JwtFilter extends OncePerRequestFilter {
       }else {
         writer.println(ExceptionEnum.ERROR_TOKEN_0001.getCode());
       }
+    /*} catch (SecurityException | MalformedJwtException e) {// 손상된 토큰
+      //response.setHeader("exception",ExceptionEnum.ERROR_TOKEN_0001.getCode());
+      request.setAttribute("exception", ExceptionEnum.ERROR_TOKEN_0001.getCode());
+    } catch (ExpiredJwtException e) {
 
-    } catch (SecurityException | MalformedJwtException e) {// 손상된 토큰
-      writer.println(ExceptionEnum.ERROR_TOKEN_0001.getCode());
-    } catch (ExpiredJwtException e) {// 만료된 토큰
-      writer.println(ExceptionEnum.ERROR_TOKEN_0002.getCode());
-    } catch (UnsupportedJwtException e) {// 지원하지 않는 토큰
-      writer.println(ExceptionEnum.ERROR_TOKEN_0003.getCode());
-    } catch (IllegalArgumentException e) {// 적합하지 않는 토큰
-      writer.println(ExceptionEnum.ERROR_TOKEN_0004.getCode());
+      request.setAttribute("exception", ExceptionEnum.ERROR_TOKEN_0002.getCode());
+    } catch (UnsupportedJwtException e) {
+
+      request.setAttribute("exception", ExceptionEnum.ERROR_TOKEN_0003.getCode());
+    } catch (IllegalArgumentException e) {
+      request.setAttribute("exception", ExceptionEnum.ERROR_TOKEN_0004.getCode());
     } catch (Exception e) {
       log.error("================================================");
       log.error("JwtFilter - doFilterInternal() 오류발생");
@@ -91,7 +105,28 @@ public class JwtFilter extends OncePerRequestFilter {
       log.error("}");
       log.error("================================================");
       request.setAttribute("exception", ExceptionEnum.RUNTIME_EXCEPTION.getCode());
+    }*/
+    } catch (SecurityException | MalformedJwtException e) {// 손상된 토큰
+      writer.println(ExceptionEnum.ERROR_TOKEN_0001.getMessage());
+    } catch (ExpiredJwtException e) {// 만료된 토큰
+      writer.println(ExceptionEnum.ERROR_TOKEN_0002.getMessage());
+    } catch (UnsupportedJwtException e) {// 지원하지 않는 토큰
+      writer.println(ExceptionEnum.ERROR_TOKEN_0003.getMessage());
+    } catch (IllegalArgumentException e) {// 적합하지 않는 토큰
+      writer.println(ExceptionEnum.ERROR_TOKEN_0004.getMessage());
+    } catch (Exception e) {
+      log.error("================================================");
+      log.error("JwtFilter - doFilterInternal() 오류발생");
+      log.error("token : {}", token);
+      log.error("Exception Message : {}", e.getMessage());
+      log.error("Exception StackTrace : {");
+      e.printStackTrace();
+      log.error("}");
+      log.error("================================================");
+      writer.println(ExceptionEnum.RUNTIME_EXCEPTION.getMessage());
+      request.setAttribute("exception", ExceptionEnum.RUNTIME_EXCEPTION.getCode());
     }
+
     filterChain.doFilter(request, response);
   }
 

@@ -49,6 +49,7 @@ public class JwtAuthToken implements AuthToken<Claims>{
 
   @Override
   public Claims getData() {
+      Claims data = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 
       return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 

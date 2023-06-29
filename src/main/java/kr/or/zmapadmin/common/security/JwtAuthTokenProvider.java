@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import kr.or.zmapadmin.model.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,7 +50,11 @@ public class JwtAuthTokenProvider implements AuthTokenProvider<JwtAuthToken>{
     if(authToken.validate()) {
       Claims claims = authToken.getData();
       Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(claims.get(AuthToken.AUTHORITIES_KEY, String.class)));
-      User principal = new User(claims.getSubject(), "", authorities);
+      //User principal = new User(claims.getSubject(), "", authorities);
+      UserInfoVo principal = new UserInfoVo();
+      principal.setId((String) claims.get("id"));
+      principal.setEmail((String)claims.get("email"));
+
       return new UsernamePasswordAuthenticationToken(principal, authToken, authorities);
     } else
         throw new JwtException("token error");

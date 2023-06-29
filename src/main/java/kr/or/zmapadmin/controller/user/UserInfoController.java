@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,5 +30,15 @@ public class UserInfoController {
                 .status(HttpStatus.OK)
                 .body(userInfoService.login(userInfoVo));
     }
+
+
+    @GetMapping(value="/getUserInfo")
+    public ResponseEntity getUserInfo(@RequestBody UserInfoVo userInfoVo){
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userInfoService.getUserInfo(userInfoVo));
+    }
+
 
 }
